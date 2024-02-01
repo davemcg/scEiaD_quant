@@ -1,0 +1,78 @@
+from snakemake.utils import min_version
+min_version("7.0")
+
+srr_sample_file = config['srr_sample_file']
+SRS_dict = metadata_builder(srr_sample_file)
+sample_names = list(SRS_dict.keys())
+
+
+git_dir = config['git_dir']
+working_dir = config['working_dir']
+conda_dir = config['conda_dir']
+fastq_path = config['fastq_path']
+quant_path = config['quant_path']
+config_abspath=config['config_abspath']
+
+rule all:
+	input:
+		expand(quant_path + '/quant/{SRS}/{reference}/{workflow}/adata.h5ad', \
+			SRS = [srs for srs in SRS_dict.keys() if SRS_dict[srs]['organism'] == wildcards.organism and SRS_dict[srs]['tech'] not in ['DropSeq', '10xv1', '10xv2', '10xv3']])
+	
+
+rule download_annotation:
+	output:
+		mouse_anno='references/gtf/mm-mus_musculus_anno.gtf.gz',
+		#macaque_faca_anno='references/gtf/macaca_fascicularis_anno.gtf.gz',
+		macaque_mul_anno= 'references/gtf/mf-macaca_mulatta_anno.gtf.gz',
+		human_anno='references/gtf/hs-homo_sapiens_anno.gtf.gz',
+		chick_anno='references/gtf/gg-gallus_gallus_anno.gtf.gz'
+	shell:
+		'''
+		mkdir -p references
+		wget -O {output.mouse_anno} ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.annotation.gtf.gz
+		wget -O {output.macaque_mul_anno} ftp://ftp.ensembl.org/pub/release-101/gtf/macaca_mulatta/Macaca_mulatta.Mmul_10.101.gtf.gz
+		wget -O {output.human_anno} ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_35/gencode.v35.annotation.gtf.gz
+		wget -O {output.chick_anno} http://ftp.ensembl.org/pub/release-104/gtf/gallus_gallus/Gallus_gallus.GRCg6a.104.gtf.gz
+		'''
+		#wget -O {output.macaque_faca_anno} ftp://ftp.ensembl.org/pub/release-98/gtf/macaca_fascicularis/Macaca_fascicularis.Macaca_fascicularis_5.0.98.gtf.gz
+
+
+
+# need to make mouse, human, macaque
+rule kb_ref:
+	input:
+		'references/fasta/{organism}.fasta.gz',
+		'references/gtf/{organism}.gtf.gz'
+	output:
+		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx',
+		t2g = 'references/t2g/{tech}/{workflow}/{reference}/t2g.txt',
+		cdna = 'references/t2g/{tech}/{workflow}/{reference}/cdna.fasta'
+	shell:
+		"""
+		kb ref --workflow={workflow} \
+			-i {output.idx} \
+			-g {output.t2g} \
+			-f1 {output.cdna} \
+			{input}
+		"""
+
+rule kb_count:
+	input:
+		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
+		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx'
+	output:
+		bus = quant_path + '/quant/{SRS}/{tech}/{reference}/output.bus',
+		ec = quant_path + '/quant/{SRS}/{tech}/{reference}/matrix.ec',
+		tx_name = quant_path + '/quant/{SRS}/{tech}/{reference}/transcripts.txt'
+	threads: 8
+	group: "bus"
+	params:
+		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
+		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['paired'] else '--single',
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.tech}/{wildcards.reference}'
+	shell:
+		'''
+		module load kallisto/0.50.1
+		kallisto bus {params.paired_flag} -t {threads} -x {params.tech} \
+					-i {input.idx} -o {params.out_dir} {input.fastq}
+		'''
