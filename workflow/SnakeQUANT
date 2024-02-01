@@ -8,7 +8,11 @@ min_version("7.0")
 #	run_accession (SRR1234)
 #	reference (hs111) # corresponds to the references.tsv file
 # 	tech (10xv2, BULK, etc)
+#	umi (yes / no)
+#   workflow (standard, lammano, nac)
 # 	everything else is optional after this
+# you absolutely can process the same sample in multiple ways
+# e.g. SRS1234 macaque_ref standard_workflow and SRS1234 human_ref nac_workflow
 srr_sample_file = config['srr_sample_file']
 SRS_dict = metadata_builder(srr_sample_file)
 sample_names = list(SRS_dict.keys())
@@ -17,7 +21,8 @@ sample_names = list(SRS_dict.keys())
 # used to match shorthand (hs111) to full ensembl/refseq/whatever gtf and fasta
 # no header
 # example hs111 <tab> http://.../Homo_sapiens.GRCh38.111.gtf.gz <tab> http://.../Homo_sapiens.GRCh38.111.fa.gz
-
+ref_file = config['ref_file']
+ref_dict = ref_builder(ref_file)
 
 
 
@@ -30,9 +35,7 @@ config_abspath=config['config_abspath']
 
 rule all:
 	input:
-		expand(quant_path + '/quant/{SRS}/{reference}/{workflow}/adata.h5ad', \
-			SRS = [srs for srs in SRS_dict.keys() if SRS_dict[srs]['organism'] == wildcards.organism and SRS_dict[srs]['tech'] not in ['DropSeq', '10xv1', '10xv2', '10xv3']])
-	
+		this_gotta_be_a_common.smk_script_thingy	
 
 rule download_ref:
 	output:
@@ -98,17 +101,17 @@ rule kb_count:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
-		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['paired'] else '--parity single -fragment-l 200 --fragment-s 30 ',
-		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.tech}/{wildcards.reference}'
+		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['umi'] else SRS_dict[wildcards.SRS]['paired'],
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.workflow}/{wildcards.reference}'
 	shell:
 		'''
 		kb count {params.paired_flag} \
-					--tmp {params.out_dir} \
+					--tmp tmp{params.out_dir} \
 					--workflow {wildcards.workflow} \
 					-t {threads} \
 					-x {params.tech} \
 					-i {input.idx} \
 					-o {params.out_dir} \
-					--h5ad \
+					--h5ad --cellranger --filter \
 					{input.fastq}
 		'''

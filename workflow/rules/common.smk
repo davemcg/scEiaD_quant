@@ -25,7 +25,8 @@ def metadata_builder(file, SRS_dict = {}):
 					    	  'paired':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ', 
 					          'ref':info[3],
 		            	      'tech':info[4],
-							  'umi': True if info[5] == 'TRUE' else False}
+							  'umi': True if info[5] == 'TRUE' else False,
+							  'workflow': info[5]}
 	return(SRS_dict)
 
 def lookup_run_from_SRS(SRS, fqp):
