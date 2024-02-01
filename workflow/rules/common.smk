@@ -11,7 +11,7 @@ import re
 
 # builds dictionary of dictionaries where first dict key is SRS 
 # and second dict key are SRS properties
-def metadata_builder(file, SRS_dict = {}, discrepancy = False):
+def metadata_builder(file, SRS_dict = {}):
 	with open(file) as file:
 		for line in file:
 			if line[0] == '#':
@@ -22,28 +22,10 @@ def metadata_builder(file, SRS_dict = {}, discrepancy = False):
 			SRS = info[0]
 			if SRS not in SRS_dict:
 				SRS_dict[SRS]={'SRR': [info[1]],
-					    	  'paired':True if info[2]=='PAIRED' else False, 
-					          'organism':info[3].replace(' ', '_'),
+					    	  'paired':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ', 
+					          'ref':info[3],
 		            	      'tech':info[4],
-						      'UMI':True if info[5].upper()=='YES' else False,
-							  'Study': info[6]}
-			else:
-				# this is mostly for SRA having the 'paired' status wrong
-				# don't want to hand-edit the main metadata file
-				# so I think better to create a new file with
-				# hand edited values for just the ones i want to change
-				if discrepancy:
-					runs = SRS_dict[SRS]['SRR']
-					SRS_dict[SRS] = {'SRR':runs,
-									 'paired':True if info[2]=='PAIRED' else False,
-									 'organism':info[3],
-									 'tech':info[4],
-									 'UMI':True if info[5]=='YES' else False,
-									 'Study': info[6]}
-				else:
-					runs = SRS_dict[SRS]['SRR']
-					runs.append(info[1])
-					SRS_dict[SRS]['SRR'] = runs
+							  'umi': True if info[5] == 'TRUE' else False}
 	return(SRS_dict)
 
 def lookup_run_from_SRS(SRS, fqp):
@@ -60,25 +42,14 @@ def lookup_run_from_SRS(SRS, fqp):
 	return(out)
 
 
-def get_whitelist_from_tech(tech):
-	if tech == 'DropSeq':
-		return f'references/whitelist/DropSeq/barcodes.txt'
-	else:
 		return('references/whitelist/10x/{tech}.txt')
 
-def get_kallisto_quant_layout_flag(is_paired):
-	if is_paired:
-		return ''
-	else: 
-		return '--single -l 200 -s 30'
 
-def DROPSEQ_samples_from_reference(quant_path ,srs_dict):
-	out= []
-	for sample in srs_dict.keys():
-		if srs_dict[sample]['tech'] == 'DropSeq' :
-			if srs_dict[sample]['organism'] == 'Homo_sapiens':
-				out.append(f'{quant_path}/quant/{sample}/DropSeq/hs-homo_sapiens/output.sorted.bus')
-			else:
-				out.append(f'{quant_path}/quant/{sample}/DropSeq/mm-mus_musculus/output.sorted.bus')
-	return out 
-
+def ref_builder(file, ref_dict = {})
+	with open(file) as file:
+		for line in file:
+			info = line.strip('\n').split('\t')
+			ref = info[0]
+			ref_dict[ref]={'gtf': [info[1]],
+							'fasta': info[2]}
+	return(ref_dict)

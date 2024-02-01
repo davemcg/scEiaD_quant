@@ -1,9 +1,24 @@
 from snakemake.utils import min_version
 min_version("7.0")
 
+# load sample tsv file
+# has header line: first must be "sample_accession"
+# required columns (again tab separated):
+#	sample_accession (SRS1234)
+#	run_accession (SRR1234)
+#	reference (hs111) # corresponds to the references.tsv file
+# 	tech (10xv2, BULK, etc)
+# 	everything else is optional after this
 srr_sample_file = config['srr_sample_file']
 SRS_dict = metadata_builder(srr_sample_file)
 sample_names = list(SRS_dict.keys())
+
+# load ref table
+# used to match shorthand (hs111) to full ensembl/refseq/whatever gtf and fasta
+# no header
+# example hs111 <tab> http://.../Homo_sapiens.GRCh38.111.gtf.gz <tab> http://.../Homo_sapiens.GRCh38.111.fa.gz
+
+
 
 
 git_dir = config['git_dir']
@@ -19,40 +34,56 @@ rule all:
 			SRS = [srs for srs in SRS_dict.keys() if SRS_dict[srs]['organism'] == wildcards.organism and SRS_dict[srs]['tech'] not in ['DropSeq', '10xv1', '10xv2', '10xv3']])
 	
 
-rule download_annotation:
+rule download_ref:
 	output:
-		mouse_anno='references/gtf/mm-mus_musculus_anno.gtf.gz',
-		#macaque_faca_anno='references/gtf/macaca_fascicularis_anno.gtf.gz',
-		macaque_mul_anno= 'references/gtf/mf-macaca_mulatta_anno.gtf.gz',
-		human_anno='references/gtf/hs-homo_sapiens_anno.gtf.gz',
-		chick_anno='references/gtf/gg-gallus_gallus_anno.gtf.gz'
+		gtf = references/gtf/{reference}.gtf.gz,
+		fasta = references/fasta/{reference}.fa.gz
+	params:
+		gtf_url = lambda wildcards: ref_dict[wildcards.reference]['gtf'],
+		fasta_url = lambda wildcards: ref_dict[wildcards.reference]['fasta']
 	shell:
 		'''
 		mkdir -p references
-		wget -O {output.mouse_anno} ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/release_M25/gencode.vM25.annotation.gtf.gz
-		wget -O {output.macaque_mul_anno} ftp://ftp.ensembl.org/pub/release-101/gtf/macaca_mulatta/Macaca_mulatta.Mmul_10.101.gtf.gz
-		wget -O {output.human_anno} ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_35/gencode.v35.annotation.gtf.gz
-		wget -O {output.chick_anno} http://ftp.ensembl.org/pub/release-104/gtf/gallus_gallus/Gallus_gallus.GRCg6a.104.gtf.gz
+		wget -O {output.gtf} {params.gtf_url}
+		wget -O {output.fasta} {params.fasta_url}
 		'''
-		#wget -O {output.macaque_faca_anno} ftp://ftp.ensembl.org/pub/release-98/gtf/macaca_fascicularis/Macaca_fascicularis.Macaca_fascicularis_5.0.98.gtf.gz
-
 
 
 # need to make mouse, human, macaque
 rule kb_ref:
 	input:
-		'references/fasta/{organism}.fasta.gz',
-		'references/gtf/{organism}.gtf.gz'
+		'references/fasta/{reference}.fasta.gz',
+		'references/gtf/{reference}.gtf.gz'
 	output:
-		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx',
-		t2g = 'references/t2g/{tech}/{workflow}/{reference}/t2g.txt',
-		cdna = 'references/t2g/{tech}/{workflow}/{reference}/cdna.fasta'
+		idx = 'references/kallisto_idx/{workflow}/{reference}.idx',
+		t2g = 'references/t2g/{workflow}/{reference}/t2g.txt',
+		cdna = 'references/t2g/{workflow}/{reference}/cdna.fasta'
+	conda:
+		"../envs/kb.yaml"
 	shell:
 		"""
-		kb ref --workflow={workflow} \
+		kb ref --workflow {params.workflow} \
 			-i {output.idx} \
 			-g {output.t2g} \
 			-f1 {output.cdna} \
+				--include-attribute gene_biotype:protein_coding \
+				--include-attribute gene_biotype:lncRNA \
+  				--include-attribute gene_biotype:lincRNA \
+  				--include-attribute gene_biotype:antisense \
+  				--include-attribute gene_biotype:IG_LV_gene \
+  				--include-attribute gene_biotype:IG_V_gene \
+  				--include-attribute gene_biotype:IG_V_pseudogene \
+  				--include-attribute gene_biotype:IG_D_gene \
+  				--include-attribute gene_biotype:IG_J_gene \
+  				--include-attribute gene_biotype:IG_J_pseudogene \
+  				--include-attribute gene_biotype:IG_C_gene \
+  				--include-attribute gene_biotype:IG_C_pseudogene \
+  				--include-attribute gene_biotype:TR_V_gene \
+  				--include-attribute gene_biotype:TR_V_pseudogene \
+  				--include-attribute gene_biotype:TR_D_gene \
+  				--include-attribute gene_biotype:TR_J_gene \
+  				--include-attribute gene_biotype:TR_J_pseudogene \
+  				--include-attribute gene_biotype:TR_C_gene \
 			{input}
 		"""
 
@@ -61,18 +92,23 @@ rule kb_count:
 		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
 		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx'
 	output:
-		bus = quant_path + '/quant/{SRS}/{tech}/{reference}/output.bus',
-		ec = quant_path + '/quant/{SRS}/{tech}/{reference}/matrix.ec',
-		tx_name = quant_path + '/quant/{SRS}/{tech}/{reference}/transcripts.txt'
+		h5ad = quant_path + '/quant/{SRS}/{workflow}/{reference}/counts_unfiltered/adata.h5ad',
 	threads: 8
-	group: "bus"
+	conda:
+		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
-		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['paired'] else '--single',
+		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['paired'] else '--parity single -fragment-l 200 --fragment-s 30 ',
 		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.tech}/{wildcards.reference}'
 	shell:
 		'''
-		module load kallisto/0.50.1
-		kallisto bus {params.paired_flag} -t {threads} -x {params.tech} \
-					-i {input.idx} -o {params.out_dir} {input.fastq}
+		kb count {params.paired_flag} \
+					--tmp {params.out_dir} \
+					--workflow {wildcards.workflow} \
+					-t {threads} \
+					-x {params.tech} \
+					-i {input.idx} \
+					-o {params.out_dir} \
+					--h5ad \
+					{input.fastq}
 		'''
