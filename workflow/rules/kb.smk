@@ -25,7 +25,9 @@ rule kb_ref:
 		"../envs/kb.yaml"
 	shell:
 		"""
+		rm -fr tmp{wildcards.reference}{wildcards.workflow}
 		kb ref --workflow {wildcards.workflow} \
+			--tmp tmp{wildcards.reference}{wildcards.workflow} \
 			-i {output.idx} \
 			-g {output.t2g} \
 			-f1 {output.cdna} \
@@ -53,7 +55,9 @@ rule kb_ref:
 rule kb_count:
 	input:
 		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
-		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx'
+		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx',
+		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
+		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	output:
 		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad',
 	threads: 8
@@ -61,17 +65,19 @@ rule kb_count:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
-		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['umi'] else SRS_dict[wildcards.SRS]['paired'],
+		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['umi'] else SRS_dict[wildcards.SRS]['parity'],
 		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}'
 	shell:
 		'''
+		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}
 		kb count {params.paired_flag} \
-					--tmp tmp{params.out_dir} \
+					--tmp tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow} \
 					--workflow {wildcards.workflow} \
+					-g {input.t2g} \
 					-t {threads} \
 					-x {params.tech} \
 					-i {input.idx} \
 					-o {params.out_dir} \
-					--h5ad --cellranger --filter \
+					--h5ad --cellranger --filter bustools \
 					{input.fastq}
 		'''
