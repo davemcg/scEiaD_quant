@@ -1,4 +1,3 @@
-print("Loading common.smk")
 import pprint
 pp = pprint.PrettyPrinter(width=41, compact=True) 
 import subprocess as sp
@@ -27,7 +26,7 @@ def metadata_builder(file, SRS_dict = {}):
 							  'parity':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ',
 							  'ref':info[3],
 							  'tech':info[4],
-							  'umi': True if info[5] == 'TRUE' else False,
+							  'umi': True if info[5].upper() == 'TRUE' else False,
 							  'workflow': info[6]}
 			else:
 				runs = SRS_dict[SRS]['SRR']
