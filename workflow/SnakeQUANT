@@ -1,6 +1,8 @@
 from snakemake.utils import min_version
 min_version("7.0")
 
+include: "rules/common.smk"
+
 # load sample tsv file
 # has header line: first must be "sample_accession"
 # required columns (again tab separated):
@@ -24,18 +26,20 @@ sample_names = list(SRS_dict.keys())
 ref_file = config['ref_file']
 ref_dict = ref_builder(ref_file)
 
-
-
-git_dir = config['git_dir']
-working_dir = config['working_dir']
-conda_dir = config['conda_dir']
 fastq_path = config['fastq_path']
 quant_path = config['quant_path']
-config_abspath=config['config_abspath']
 
+
+adata_outputs = []
+for i in SRS_dict.keys():
+	adata_outputs.append(quant_path + 
+						 '/quant/' + 
+						 i + '/' + x[i]['workflow'] + 
+						 '/' + x[i]['ref'] + 
+						 '/counts_unfiltered/adata.h5ad')
 rule all:
 	input:
-		this_gotta_be_a_common.smk_script_thingy	
+		adata_outputs
 
 rule download_ref:
 	output:
@@ -51,8 +55,6 @@ rule download_ref:
 		wget -O {output.fasta} {params.fasta_url}
 		'''
 
-
-# need to make mouse, human, macaque
 rule kb_ref:
 	input:
 		'references/fasta/{reference}.fasta.gz',
@@ -95,14 +97,14 @@ rule kb_count:
 		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
 		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx'
 	output:
-		h5ad = quant_path + '/quant/{SRS}/{workflow}/{reference}/counts_unfiltered/adata.h5ad',
+		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad',
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
 		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['umi'] else SRS_dict[wildcards.SRS]['paired'],
-		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.workflow}/{wildcards.reference}'
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}'
 	shell:
 		'''
 		kb count {params.paired_flag} \

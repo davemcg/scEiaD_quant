@@ -22,11 +22,16 @@ def metadata_builder(file, SRS_dict = {}):
 			SRS = info[0]
 			if SRS not in SRS_dict:
 				SRS_dict[SRS]={'SRR': [info[1]],
-					    	  'paired':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ', 
-					          'ref':info[3],
-		            	      'tech':info[4],
+							  'paired': True if info[2] == 'PAIRED' else False,
+							  'parity':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ',
+							  'ref':info[3],
+							  'tech':info[4],
 							  'umi': True if info[5] == 'TRUE' else False,
-							  'workflow': info[5]}
+							  'workflow': info[6]}
+			else:
+				runs = SRS_dict[SRS]['SRR']
+				runs.append(info[1])
+				SRS_dict[SRS]['SRR'] = runs
 	return(SRS_dict)
 
 def lookup_run_from_SRS(SRS, fqp):
@@ -41,10 +46,6 @@ def lookup_run_from_SRS(SRS, fqp):
 			#SE
 			out.append(f'{fqp}/fastq/{SRR}.fastq.gz')
 	return(out)
-
-
-		return('references/whitelist/10x/{tech}.txt')
-
 
 def ref_builder(file, ref_dict = {})
 	with open(file) as file:

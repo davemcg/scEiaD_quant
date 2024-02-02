@@ -1,0 +1,4 @@
+hs111	http://ftp.ensembl.org/pub/release-111/gtf/homo_sapiens/Homo_sapiens.GRCh38.111.gtf.gz	https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+mm111	http://ftp.ensembl.org/pub/release-111/gtf/mus_musculus/Mus_musculus.GRCh38.111.gtf.gz  https://ftp.ensembl.org/pub/release-111/fasta/mus_musculus/dna/Mus_musculs.GRCh38.dna.primary_assembly.fa.gz
+mf111	https://ftp.ensembl.org/pub/release-111/gtf/macaca_mulatta/Macaca_mulatta.Mmul_10.111.gtf.gz	http://ftp.ensembl.org/pub/release-111/fasta/macaca_mulatta/dna/Macaca_mulatta.Mmul_10.dna.toplevel.fa.gz
+gg111	https://ftp.ensembl.org/pub/release-111/gtf/gallus_gallus/Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.111.gtf.gz	http://ftp.ensembl.org/pub/release-111/fasta/gallus_gallus/dna/Gallus_gallus.bGalGal1.mat.broiler.GRCg7b.dna_sm.toplevel.fa.gz
