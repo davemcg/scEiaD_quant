@@ -1,9 +1,7 @@
-srr_sample_file: '/home/mcgaugheyd/git/scEiaD/data/sample_run_layout_organism_tech_biosample_organ_2022_03_04.tsv'
-git_dir: '/home/mcgaugheyd/git/scEiaD_quant/' 
-bustools_path:  '/home/mcgaugheyd/git/bustools/build/src/'
+srr_sample_file: '/Users/mcgaugheyd/git/scEiaD_quant/sample_mini.tsv'
+ref_file: '/Users/mcgaugheyd/git/scEiaD_quant/reference_table.tsv'
+git_dir: '/Users/mcgaugheyd/git/scEiaD_quant/' 
 working_dir: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/'
-conda_dir: '/data/mcgaugheyd/conda/'
-config_abspath: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/config.yaml'
+config_abspath: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/config/config.yaml'
 fastq_path: '/data/OGVFB_BG/scEiaD'
 quant_path: '/data/OGVFB_BG/scEiaD/2024_01_21'
-droplet_only_org: ['Macaca_fascicularis', 'Gallus_gallus']

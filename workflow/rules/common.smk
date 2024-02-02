@@ -1,3 +1,4 @@
+print("Loading common.smk")
 import pprint
 pp = pprint.PrettyPrinter(width=41, compact=True) 
 import subprocess as sp
@@ -47,7 +48,7 @@ def lookup_run_from_SRS(SRS, fqp):
 			out.append(f'{fqp}/fastq/{SRR}.fastq.gz')
 	return(out)
 
-def ref_builder(file, ref_dict = {})
+def ref_builder(file, ref_dict = {}):
 	with open(file) as file:
 		for line in file:
 			info = line.strip('\n').split('\t')

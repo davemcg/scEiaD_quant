@@ -34,35 +34,39 @@ adata_outputs = []
 for i in SRS_dict.keys():
 	adata_outputs.append(quant_path + 
 						 '/quant/' + 
-						 i + '/' + x[i]['workflow'] + 
-						 '/' + x[i]['ref'] + 
+						 i + '/' + SRS_dict[i]['ref'] + 
+						 '/' + SRS_dict[i]['workflow'] + 
 						 '/counts_unfiltered/adata.h5ad')
+
+print(adata_outputs)
+
 rule all:
 	input:
 		adata_outputs
 
 rule download_ref:
 	output:
-		gtf = references/gtf/{reference}.gtf.gz,
-		fasta = references/fasta/{reference}.fa.gz
+		gtf = 'references/gtf/{reference}.gtf.gz',
+		fasta = 'references/fasta/{reference}.fa.gz'
 	params:
 		gtf_url = lambda wildcards: ref_dict[wildcards.reference]['gtf'],
 		fasta_url = lambda wildcards: ref_dict[wildcards.reference]['fasta']
 	shell:
 		'''
-		mkdir -p references
+		mkdir -p references/gtf
+		mkdir -p references/fasta
 		wget -O {output.gtf} {params.gtf_url}
 		wget -O {output.fasta} {params.fasta_url}
 		'''
 
 rule kb_ref:
 	input:
-		'references/fasta/{reference}.fasta.gz',
+		'references/fasta/{reference}.fa.gz',
 		'references/gtf/{reference}.gtf.gz'
 	output:
-		idx = 'references/kallisto_idx/{workflow}/{reference}.idx',
-		t2g = 'references/t2g/{workflow}/{reference}/t2g.txt',
-		cdna = 'references/t2g/{workflow}/{reference}/cdna.fasta'
+		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx',
+		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
+		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	conda:
 		"../envs/kb.yaml"
 	shell:
@@ -95,7 +99,7 @@ rule kb_ref:
 rule kb_count:
 	input:
 		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
-		idx = 'references/kallisto_idx/{tech}/{workflow}/{reference}.idx'
+		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx'
 	output:
 		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad',
 	threads: 8
