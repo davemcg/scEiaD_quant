@@ -1,0 +1,23 @@
+{
+	"__default__" :
+	{
+		"partition" : "quick",
+		"time" : "04:00:00",
+		"mem" : "8g",
+		"extra" : " --gres=lscratch:2",
+		"output"  : "00log/{rule}_{wildcards}.out",
+		"error" : "00log/{rule}_{wildcards}.err" 
+	},
+	"kb_ref":
+	{
+		"time" : "08:00:00",
+		"mem" : "64G",
+		"partition" : "norm"
+	},
+	"kb_count" :
+	{
+		"mem": "24g",
+		"time" : "01:45:00",
+		"partition" : "quick"
+	}
+}
