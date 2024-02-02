@@ -15,6 +15,7 @@ sbcmd="sbatch --cpus-per-task={threads} \
 
 
 snakemake -s $1 \
+  --rerun-triggers mtime \
   -pr --local-cores 2 --jobs 500 \
   --cluster-config $3 \
   --cluster "$sbcmd"  --latency-wait 120 --rerun-incomplete \
