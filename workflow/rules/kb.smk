@@ -59,18 +59,20 @@ rule kb_count:
 		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
 		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	output:
-		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad',
+		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/matrix.ec',
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
 		paired_flag = lambda wildcards: '' if SRS_dict[wildcards.SRS]['umi'] else SRS_dict[wildcards.SRS]['parity'],
+		filter_flag = lambda wildcards: ' --filter bustools --cellranger ' if SRS_dict[wildcards.SRS]['umi'] else '',
 		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}'
 	shell:
 		'''
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}
 		kb count {params.paired_flag} \
+					{params.filter_flag} \
 					--tmp tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow} \
 					--workflow {wildcards.workflow} \
 					-g {input.t2g} \
@@ -78,6 +80,6 @@ rule kb_count:
 					-x {params.tech} \
 					-i {input.idx} \
 					-o {params.out_dir} \
-					--h5ad --cellranger --filter bustools \
+					--h5ad \
 					{input.fastq}
 		'''

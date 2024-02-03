@@ -36,7 +36,7 @@ for i in SRS_dict.keys():
 						 '/quant/' + 
 						 i + '/' + SRS_dict[i]['ref'] + 
 						 '/' + SRS_dict[i]['workflow'] + 
-						 '/counts_unfiltered/adata.h5ad')
+						 '/matrix.ec')
 
 
 rule all:

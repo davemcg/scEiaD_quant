@@ -23,7 +23,7 @@ def metadata_builder(file, SRS_dict = {}):
 			if SRS not in SRS_dict:
 				SRS_dict[SRS]={'SRR': [info[1]],
 							  'paired': True if info[2] == 'PAIRED' else False,
-							  'parity':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 ',
+							  'parity':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 --tcc ',
 							  'ref':info[3],
 							  'tech':info[4],
 							  'umi': True if info[5].upper() == 'TRUE' else False,
