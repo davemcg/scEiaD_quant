@@ -30,17 +30,31 @@ fastq_path = config['fastq_path']
 quant_path = config['quant_path']
 
 
-adata_outputs = []
+adata_umi_outputs = []
+adata_bulk_outputs = []
 for i in SRS_dict.keys():
-	adata_outputs.append(quant_path + 
+	if SRS_dict[i]['umi']:
+		adata_umi_outputs.append(quant_path + 
 						 '/quant/' + 
 						 i + '/' + SRS_dict[i]['ref'] + 
-						 '/' + SRS_dict[i]['workflow'] + 
-						 '/matrix.ec')
-
-
-rule all:
-	input:
-		adata_outputs
+						 '/' + SRS_dict[i]['workflow'])
+	else:
+		adata_bulk_outputs.append(quant_path + 
+						 '/quant/' + 
+						 i + '/' + SRS_dict[i]['ref'] + 
+						 '/' + SRS_dict[i]['workflow'])
+	
+if config['make_10x_style_mtx']:
+	include: "rules/convert_mtx.smk"
+	rule all:
+		input:
+			[l + '/matrix.ec' for l in adata_bulk_outputs],
+			[l + '/filtered_gene_bc_matrices/matrix.mtx' for l in adata_umi_outputs],
+			[l + '/raw_gene_bc_matrices/matrix.mtx' for l in adata_umi_outputs]
+else:
+	rule all:
+		input:
+			[l + '/matrix.ec' for l in adata_bulk_outputs],
+			[l + '/counts_unfiltered/cells_x_genes.mtx' for l in adata_bulk_outputs]
 
 include: "rules/kb.smk"

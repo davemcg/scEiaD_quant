@@ -52,14 +52,17 @@ rule kb_ref:
 			{input}
 		"""
 
-rule kb_count:
+rule kb_umi_count:
 	input:
 		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
 		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx',
 		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
 		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	output:
-		h5ad = quant_path + '/quant/{SRS}/{reference}/{workflow}/matrix.ec',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}/cells_x_genes.mtx',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}/cells_x_genes.genes.txt',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}/cells_x_genes.barcodes.txt',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}/cells_x_genes.genes.names.txt'
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
@@ -73,6 +76,37 @@ rule kb_count:
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}
 		kb count {params.paired_flag} \
 					{params.filter_flag} \
+					--tmp tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow} \
+					--workflow {wildcards.workflow} \
+					-g {input.t2g} \
+					-t {threads} \
+					-x {params.tech} \
+					-i {input.idx} \
+					-o {params.out_dir} \
+					--h5ad \
+					{input.fastq}
+		'''
+
+
+rule kb_bulk_count:
+	input:
+		fastq = lambda wildcards: lookup_run_from_SRS(wildcards.SRS, fastq_path),
+		idx = 'references/kallisto_idx/{reference}/{workflow}/index.idx',
+		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
+		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
+	output:
+		ec = quant_path + '/quant/{SRS}/{reference}/{workflow}/matrix.ec',
+	threads: 8
+	conda:
+		"../envs/kb.yaml"
+	params:
+		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
+		paired_flag = lambda wildcards: SRS_dict[wildcards.SRS]['parity'],
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}'
+	shell:
+		'''
+		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}
+		kb count {params.paired_flag} \
 					--tmp tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow} \
 					--workflow {wildcards.workflow} \
 					-g {input.t2g} \

@@ -5,3 +5,4 @@ working_dir: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/'
 config_abspath: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/config/config.yaml'
 fastq_path: '/data/OGVFB_BG/scEiaD'
 quant_path: '/data/OGVFB_BG/scEiaD/2024_01_21'
+make_10x_style_mtx: True
