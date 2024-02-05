@@ -55,3 +55,5 @@ def ref_builder(file, ref_dict = {}):
 			ref_dict[ref]={'gtf': [info[1]],
 							'fasta': info[2]}
 	return(ref_dict)
+
+git_dir = config['git_dir']

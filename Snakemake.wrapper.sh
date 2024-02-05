@@ -2,7 +2,6 @@
 
 # run in the data folder for this project
 # on biowulf2
-
 mkdir -p 00log
 
 sbcmd="sbatch --cpus-per-task={threads} \

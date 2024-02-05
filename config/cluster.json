@@ -19,5 +19,11 @@
 		"mem": "24g",
 		"time" : "01:45:00",
 		"partition" : "quick"
+	},
+	"cellbender" :
+	{
+		"mem": "24g",
+		"partition" : "gpu",
+		"extra" : " --gres=gpu:v100x:1,lscratch:5"
 	}
 }

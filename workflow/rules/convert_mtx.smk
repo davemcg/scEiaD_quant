@@ -10,7 +10,6 @@ def kallisto_to_10x_naming(base_dir, filter_status):
 	out.append(base_dir + subfolder + 'cells_x_genes.genes.names.txt')
 	return(out)
 	
-
 rule convert_mtx:
 	input:
 		lambda wildcards: kallisto_to_10x_naming(quant_path + '/quant/{SRS}/{reference}/{workflow}', wildcards.filter_status)
@@ -20,5 +19,7 @@ rule convert_mtx:
 		"../envs/convert_mtx.yaml"
 	params:
 		out_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}'
-	script:
-		"Rscript scripts/convert_mtx.R {input} {output}"
+	shell:
+		"""
+		Rscript {git_dir}/workflow/scripts/convert_mtx.R {input} {params.out_dir}
+		"""
