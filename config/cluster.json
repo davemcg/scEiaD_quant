@@ -31,5 +31,11 @@
 		"mem": "24g",
 		"partition" : "gpu",
 		"extra" : " --gres=gpu:v100x:1,lscratch:5"
+	},
+    "solo" :
+	{
+		"mem": "24g",
+		"partition" : "gpu",
+		"extra" : " --gres=gpu:a100:1,lscratch:5"
 	}
 }

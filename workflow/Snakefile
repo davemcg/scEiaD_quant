@@ -48,7 +48,7 @@ rule all:
 	input:
 		[l + '/matrix.ec' for l in adata_bulk_outputs],
 		#[l + '/raw_gene_bc_matrices/matrix.mtx' for l in adata_umi_outputs],
-		[l + '/final/QC.adata.h5ad' for l in adata_umi_outputs],
+		[l + '/final/QC.adata.solo.h5ad' for l in adata_umi_outputs],
 		[l + '/final/QC.seuratV5.Rdata'  for l in adata_umi_outputs]
 
 include: "rules/kb.smk"
@@ -56,3 +56,4 @@ include: "rules/convert_mtx.smk"
 include: "rules/cellbender.smk"
 include: "rules/make_descriptive_gene_names.smk"
 include: "rules/qc_filtering.smk"
+include: "rules/solo.smk"
