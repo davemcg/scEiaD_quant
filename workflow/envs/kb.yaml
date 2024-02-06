@@ -3,4 +3,7 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  - kb-python =0.28.2
+  - python =3.10
+  - pip
+  - pip:
+    - kb-python==0.28.2

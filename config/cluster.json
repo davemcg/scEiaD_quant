@@ -14,7 +14,13 @@
 		"mem" : "64G",
 		"partition" : "norm"
 	},
-	"kb_count" :
+	"kb_umi_count" :
+	{
+		"mem": "24g",
+		"time" : "01:45:00",
+		"partition" : "quick"
+	},
+	"kb_bulk_count" :
 	{
 		"mem": "24g",
 		"time" : "01:45:00",

@@ -3,10 +3,12 @@ rule cellbender:
 	input:
 		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/cellbender_filtered.h5'
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5'),
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender.h5'),
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_posterior.h5')
 	params:
-		h5 = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/cellbender.h5',
-		working_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/',
+		h5 = quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender.h5',
+		working_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/',
 	conda:
 		"../envs/cellbender.yaml"
 	shell:
@@ -18,10 +20,12 @@ rule cellbender:
 
 rule h5_to_h5ad:
 	input:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/cellbender_filtered.h5'
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/cellbender_filtered.h5ad'
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5ad'),
+		quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.obs.csv.gz'
 	conda:
 		"../envs/cellbender.yaml"
 	script:
 		"../scripts/cellbender_h5_to_h5ad.py"
+
