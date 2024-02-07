@@ -22,20 +22,20 @@
 	},
 	"kb_umi_count" :
 	{
-		"mem": "16g",
+		"mem": "24g",
 		"time" : "03:45:00",
 		"partition" : "quick"
 	},
 	"kb_umi_count_nac" :
 	{
-		"mem": "16g",
+		"mem": "24g",
 		"time" : "03:45:00",
 		"partition" : "quick"
 	},
 	"kb_bulk_count" :
 	{
-		"mem": "24g",
-		"time" : "01:45:00",
+		"mem": "4g",
+		"time" : "00:45:00",
 		"partition" : "quick"
 	},
 	"cellbender" :
