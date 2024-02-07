@@ -14,10 +14,22 @@
 		"mem" : "64G",
 		"partition" : "norm"
 	},
+	"kb_ref_nac":
+	{
+		"time" : "08:00:00",
+		"mem" : "64G",
+		"partition" : "norm"
+	},
 	"kb_umi_count" :
 	{
-		"mem": "24g",
-		"time" : "01:45:00",
+		"mem": "16g",
+		"time" : "03:45:00",
+		"partition" : "quick"
+	},
+	"kb_umi_count_nac" :
+	{
+		"mem": "16g",
+		"time" : "03:45:00",
 		"partition" : "quick"
 	},
 	"kb_bulk_count" :
