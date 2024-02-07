@@ -16,7 +16,7 @@ include: "rules/common.smk"
 # you absolutely can process the same sample in multiple ways
 # e.g. SRS1234 macaque_ref standard_workflow and SRS1234 human_ref nac_workflow
 srr_sample_file = config['srr_sample_file']
-SRS_dict = metadata_builder(srr_sample_file)
+SRS_dict = sample_dict_builder(srr_sample_file)
 sample_names = list(SRS_dict.keys())
 
 # load ref table
@@ -30,19 +30,8 @@ fastq_path = config['fastq_path']
 quant_path = config['quant_path']
 
 
-adata_umi_outputs = []
-adata_bulk_outputs = []
-for i in SRS_dict.keys():
-	if SRS_dict[i]['umi']:
-		adata_umi_outputs.append(quant_path + 
-						 '/quant/' + 
-						 i + '/' + SRS_dict[i]['ref'] + 
-						 '/' + SRS_dict[i]['workflow'])
-	else:
-		adata_bulk_outputs.append(quant_path + 
-						 '/quant/' + 
-						 i + '/' + SRS_dict[i]['ref'] + 
-						 '/' + SRS_dict[i]['workflow'])
+adata_umi_outputs, adata_bulk_outputs =  make_core_outputs(srr_sample_file, quant_path)
+
 	
 rule all:
 	input:

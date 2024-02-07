@@ -10,8 +10,8 @@ import time
 import re
 
 # builds dictionary of dictionaries where first dict key is SRS 
-# and second dict key are SRS properties
-def metadata_builder(file, SRS_dict = {}):
+# and second dict key are important SRS properties
+def sample_dict_builder(file, SRS_dict = {}):
 	with open(file) as file:
 		for line in file:
 			if line[0] == '#':
@@ -24,15 +24,29 @@ def metadata_builder(file, SRS_dict = {}):
 				SRS_dict[SRS]={'SRR': [info[1]],
 							  'paired': True if info[2] == 'PAIRED' else False,
 							  'parity':' --parity paired ' if info[2]=='PAIRED' else '--parity single --fragment-l 200 --fragment-s 30 --tcc ',
-							  'ref':info[3],
-							  'tech':info[4],
-							  'umi': True if info[5].upper() == 'TRUE' else False,
-							  'workflow': info[6]}
+							  'tech':info[4]}
 			else:
 				runs = SRS_dict[SRS]['SRR']
 				runs.append(info[1])
 				SRS_dict[SRS]['SRR'] = runs
 	return(SRS_dict)
+
+def make_core_outputs(file, quant_path, umi_outputs = [], bulk_outputs = []):
+	with open(file) as file:
+		for line in file:
+			if line[0] == '#':
+				continue
+			info = line.strip('\n').split('\t')
+			if info[0] == 'sample_accession':
+				continue
+			if info[5].upper() == 'TRUE':
+				umi_outputs.append(quant_path + '/quant/' + info[0] + \
+							'/' + info[3] + '/' + info[6])
+			else:
+				bulk_outputs.append(quant_path + '/quant/' + info[0] + \
+							'/' + info[3] + '/' + info[6])
+				
+		return([list(set(umi_outputs)), list(set(bulk_outputs))])
 
 def lookup_run_from_SRS(SRS, fqp):
 	SRR_files=SRS_dict[SRS]['SRR']

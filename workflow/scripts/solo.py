@@ -3,7 +3,8 @@ import scanpy as sc
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("input")
-parser.add_argument("output")
+parser.add_argument("h5adoutput")
+parser.add_argument("obsoutput")
 args = parser.parse_args()
 
 adata = sc.read_h5ad(args.input)
@@ -27,4 +28,5 @@ adata.obs['solo_doublet'] = adata.obs.index.isin(doublets.index)
 
 adata.obs['solo_score'] = preds['solo_dif']
 
-adata.write(args.output)
+adata.write(args.h5adoutput)
+adata.obs.to_csv(args.obsoutput)
