@@ -46,6 +46,7 @@
 	},
     "solo" :
 	{
+		"time" : "01:00:00",
 		"mem": "24g",
 		"partition" : "gpu",
 		"extra" : " --gres=gpu:a100:1,lscratch:5"
