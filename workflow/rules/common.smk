@@ -8,12 +8,18 @@ import string
 import itertools
 import time 
 import re
+import gzip
 
+def opener(filename, mode):
+	if filename.endswith('.gz'):
+		return gzip.open(filename, mode)
+	else:
+		return open(filename, mode)
 # builds dictionary of dictionaries where first dict key is SRS 
 # and second dict key are important SRS properties
-def sample_dict_builder(file, SRS_dict = {}):
-	with open(file) as file:
-		for line in file:
+def sample_dict_builder(filename, SRS_dict = {}):
+	with opener(filename, 'rt') as txt:
+		for line in txt:
 			if line[0] == '#':
 				continue
 			info = line.strip('\n').split('\t')
@@ -31,9 +37,9 @@ def sample_dict_builder(file, SRS_dict = {}):
 				SRS_dict[SRS]['SRR'] = runs
 	return(SRS_dict)
 
-def make_core_outputs(file, quant_path, umi_outputs = [], bulk_outputs = []):
-	with open(file) as file:
-		for line in file:
+def make_core_outputs(filename, quant_path, umi_outputs = [], bulk_outputs = []):
+	with opener(filename, 'rt') as txt:
+		for line in txt:
 			if line[0] == '#':
 				continue
 			info = line.strip('\n').split('\t')

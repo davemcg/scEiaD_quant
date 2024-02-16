@@ -1,4 +1,4 @@
-srr_sample_file: '/home/mcgaugheyd/git/scEiaD_quant/sample_mini.tsv'
+srr_sample_file: '/home/mcgaugheyd/git/scEiaD_quant/sample_meta.scEiaD_v1.2024_02_07.tsv.gz'
 ref_file: '/home/mcgaugheyd/git/scEiaD_quant/reference_table.tsv'
 git_dir: '/home/mcgaugheyd/git/scEiaD_quant/' 
 working_dir: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/'

@@ -128,6 +128,7 @@ rule kb_umi_count:
 			-o {params.out_dir} \
 			--h5ad \
 			{input.fastq}
+		rm -f {params.out_dir}*bus
 		'''
 
 rule kb_umi_count_nac:
@@ -140,7 +141,8 @@ rule kb_umi_count_nac:
 		c1 = 'references/t2g/{reference}/nac/t2c.cdna.txt',
 		c2 = 'references/t2g/{reference}/nac/t2c.unprocessed.txt'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.mtx',
+		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.mature.mtx',
+		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.nascent.mtx',
 		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.genes.txt',
 		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.barcodes.txt',
 		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.genes.names.txt',
@@ -166,6 +168,7 @@ rule kb_umi_count_nac:
 			-o {params.out_dir} \
 			--h5ad \
 			{input.fastq}
+		rm -f {params.out_dir}*bus
 		'''
 
 
@@ -197,4 +200,5 @@ rule kb_bulk_count:
 					-o {params.out_dir} \
 					--h5ad \
 					{input.fastq}
+		rm -f {params.out_dir}*bus
 		'''

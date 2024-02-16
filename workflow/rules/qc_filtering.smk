@@ -7,11 +7,15 @@ rule filter_seurat:
 		noQC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/noQC.seuratV5.Rdata',
 		QC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/QC.seuratV5.Rdata',
 		faux = temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/final/SEURAT_DONE')
+	params:
+		path = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/'
 	conda:
 		"../envs/snakequant_seurat_qc.yaml"
 	shell:
 		"""
+		cd {params.path}
 		Rscript {git_dir}/workflow/scripts/filter_seurat.R {input} {wildcards.SRS} {output}
+		cd -
 		touch {output.faux}
 		"""
 
