@@ -180,7 +180,7 @@ rule kb_bulk_count:
 		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	output:
 		ec = quant_path + '/quant/{SRS}/{reference}/{workflow}/matrix.ec',
-	threads: 8
+	threads: 1 
 	conda:
 		"../envs/kb.yaml"
 	params:
@@ -191,6 +191,7 @@ rule kb_bulk_count:
 		'''
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}
 		kb count {params.paired_flag} \
+					--matrix-to-files \
 					--tmp tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow} \
 					--workflow {wildcards.workflow} \
 					-g {input.t2g} \
@@ -198,7 +199,6 @@ rule kb_bulk_count:
 					-x {params.tech} \
 					-i {input.idx} \
 					-o {params.out_dir} \
-					--h5ad \
 					{input.fastq}
-		rm -f {params.out_dir}*bus
+		rm -f {params.out_dir}/*bus
 		'''

@@ -42,7 +42,13 @@ rule all:
 
 include: "rules/kb.smk"
 include: "rules/convert_mtx.smk"
-include: "rules/cellbender.smk"
+
+if config['decontamination'] == 'cellbender':
+	include: "rules/cellbender.smk"
+
+if config['decontamination'] == 'decontX':
+	include: "rules/decontX.smk"
+
 include: "rules/make_descriptive_gene_names.smk"
 include: "rules/qc_filtering.smk"
 include: "rules/solo.smk"

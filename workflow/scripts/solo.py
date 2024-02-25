@@ -11,10 +11,10 @@ adata = sc.read_h5ad(args.input)
 
 scvi.model.SCVI.setup_anndata(adata)
 vae = scvi.model.SCVI(adata)
-vae.train(early_stopping = True, accelerator = 'gpu')
+vae.train(early_stopping = True, accelerator = 'gpu', batch_size =127)
 
 solo = scvi.external.SOLO.from_scvi_model(vae)
-solo.train()
+solo.train(batch_size =127)
 
 preds = solo.predict()
 
