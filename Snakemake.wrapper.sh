@@ -14,6 +14,7 @@ sbcmd="sbatch --cpus-per-task={threads} \
 
 
 snakemake -s $1 \
+  --groups dropkick=decont h5ad_to_seurat=decont decontX=decont seurat_to_h5ad=decont kb_bulk_count=quant --group-components quant=10 \
   --rerun-triggers mtime \
   -pr --local-cores 2 --jobs 500 \
   --cluster-config $3 \
