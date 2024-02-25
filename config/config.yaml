@@ -1,8 +1,9 @@
-srr_sample_file: '/home/mcgaugheyd/git/scEiaD_quant/sample_meta.scEiaD_v1.2024_02_07.tsv.gz'
+srr_sample_file: '/home/mcgaugheyd/git/scEiaD_quant/sample_meta.scEiaD_v1.2024_02_09.tsv.gz'
 ref_file: '/home/mcgaugheyd/git/scEiaD_quant/reference_table.tsv'
 git_dir: '/home/mcgaugheyd/git/scEiaD_quant/' 
 working_dir: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/'
 config_abspath: '/data/mcgaugheyd/projects/nei/mcgaughey/scEiaD_2024_01/config/config.yaml'
 fastq_path: '/data/OGVFB_BG/scEiaD'
-quant_path: '/data/OGVFB_BG/scEiaD/2024_01_21'
+quant_path: '/data/OGVFB_BG/scEiaD/2024_02_22'
 make_10x_style_mtx: True
+decontamination: "decontX"

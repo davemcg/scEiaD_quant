@@ -3,7 +3,7 @@
 	{
 		"partition" : "quick",
 		"time" : "04:00:00",
-		"mem" : "8g",
+		"mem" : "16G",
 		"extra" : " --gres=lscratch:2",
 		"output"  : "00log/{rule}_{wildcards}.out",
 		"error" : "00log/{rule}_{wildcards}.err" 
@@ -50,5 +50,13 @@
 		"mem": "24g",
 		"partition" : "gpu",
 		"extra" : " --gres=gpu:a100:1,lscratch:5"
+	},
+	"decont" :
+	{
+		"mem" : "128G"
+	},
+	"quant" :
+	{
+		"mem" : "24G"
 	}
 }
