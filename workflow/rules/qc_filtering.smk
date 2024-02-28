@@ -1,14 +1,14 @@
 rule filter_seurat_cellbender:
 	input:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5ad',
-		quant_path +'/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.obs.csv.gz',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/gene_tab.csv',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.h5ad',
+		quant_path +'/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.obs.csv.gz',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_unfiltered/gene_tab.csv',
 	output:
-		noQC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/noQC.seuratV5.Rdata',
-		QC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/QC.seuratV5.Rdata',
-		faux = temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/final/SEURAT_DONE')
+		noQC = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/noQC.seuratV5.Rdata',
+		QC = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/QC.seuratV5.Rdata',
+		faux = temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/SEURAT_DONE')
 	params:
-		path = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/'
+		path = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/'
 	conda:
 		"../envs/snakequant_seurat_qc.yaml"
 	shell:
@@ -21,12 +21,12 @@ rule filter_seurat_cellbender:
 
 rule filter_scanpy_cellbender:
 	input:
-		quant_path +'/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5ad',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/gene_tab.csv',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/final/SEURAT_DONE'
+		quant_path +'/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.h5ad',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_unfiltered/gene_tab.csv',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/SEURAT_DONE'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/final/noQC.adata.h5ad',
-		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/final/QC.adata.h5ad')
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/noQC.adata.h5ad',
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/QC.adata.h5ad')
 	conda:
 		"../envs/cellbender.yaml"
 	script:
@@ -35,15 +35,15 @@ rule filter_scanpy_cellbender:
 		
 rule filter_seurat_decontX:
 	input:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_filtered/adata_dropkick_decontX.h5ad',
-		quant_path +'/quant/{SRS}/{reference}/{workflow}/counts_filtered/adata_dropkick_decontX.obs.csv.gz',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/gene_tab.csv',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_filtered/adata_dropkick_decontX.h5ad',
+		quant_path +'/quant/{SRS}/{reference}/{workflow}_{sum}/counts_filtered/adata_dropkick_decontX.obs.csv.gz',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_unfiltered/gene_tab.csv',
 	output:
-		noQC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/noQC.seuratV5.Rdata',
-		QC = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/QC.seuratV5.Rdata',
-		faux = temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/final/SEURAT_DONE')
+		noQC = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/noQC.seuratV5.Rdata',
+		QC = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/QC.seuratV5.Rdata',
+		faux = temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/SEURAT_DONE')
 	params:
-		path = quant_path + '/quant/{SRS}/{reference}/{workflow}/final/'
+		path = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/'
 	conda:
 		"../envs/snakequant_seurat_qc.yaml"
 	shell:
@@ -57,12 +57,12 @@ rule filter_seurat_decontX:
 
 rule filter_scanpy_decontX:
 	input:
-		quant_path +'/quant/{SRS}/{reference}/{workflow}/counts_filtered/adata_dropkick_decontX.h5ad',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/gene_tab.csv',
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/final/SEURAT_DONE'
+		quant_path +'/quant/{SRS}/{reference}/{workflow}_{sum}/counts_filtered/adata_dropkick_decontX.h5ad',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_unfiltered/gene_tab.csv',
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/SEURAT_DONE'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/final/noQC.adata.h5ad',
-		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/final/QC.adata.h5ad')
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/noQC.adata.h5ad',
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/final/QC.adata.h5ad')
 	conda:
 		"../envs/cellbender.yaml"
 	script:

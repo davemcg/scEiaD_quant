@@ -14,11 +14,11 @@ rule convert_mtx:
 	input:
 		lambda wildcards: kallisto_to_10x_naming(quant_path + '/quant/{SRS}/{reference}/{workflow}', wildcards.filter_status)
 	output:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}/matrix.mtx'
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/{filter_status}/matrix.mtx'
 	conda:
 		"../envs/convert_mtx.yaml"
 	params:
-		out_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}/{filter_status}'
+		out_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/{filter_status}'
 	shell:
 		"""
 		Rscript {git_dir}/workflow/scripts/convert_mtx.R {input} {params.out_dir}

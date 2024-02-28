@@ -104,23 +104,24 @@ rule kb_umi_count:
 		t2g = 'references/t2g/{reference}/standard/t2g.txt',
 		cdna = 'references/t2g/{reference}/standard/cdna.fasta'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/standard/counts_unfiltered/cells_x_genes.mtx',
-		quant_path + '/quant/{SRS}/{reference}/standard/counts_unfiltered/cells_x_genes.genes.txt',
-		quant_path + '/quant/{SRS}/{reference}/standard/counts_unfiltered/cells_x_genes.barcodes.txt',
-		quant_path + '/quant/{SRS}/{reference}/standard/counts_unfiltered/cells_x_genes.genes.names.txt',
-		quant_path + '/quant/{SRS}/{reference}/standard/counts_unfiltered/adata.h5ad'
+		quant_path + '/quant/{SRS}/{reference}/standard_{sum}/counts_unfiltered/cells_x_genes.mtx',
+		quant_path + '/quant/{SRS}/{reference}/standard_{sum}/counts_unfiltered/cells_x_genes.genes.txt',
+		quant_path + '/quant/{SRS}/{reference}/standard_{sum}/counts_unfiltered/cells_x_genes.barcodes.txt',
+		quant_path + '/quant/{SRS}/{reference}/standard_{sum}/counts_unfiltered/cells_x_genes.genes.names.txt',
+		quant_path + '/quant/{SRS}/{reference}/standard_{sum}/counts_unfiltered/adata.h5ad'
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
-		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/standard'
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/standard_{wildcards.sum}'
 	shell:
 		'''
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}standard
 		kb count \
 			--tmp tmp{wildcards.SRS}{wildcards.reference}standard \
 			--workflow standard \
+			--sum {wildcards.sum} \
 			-g {input.t2g} \
 			-t {threads} \
 			-x {params.tech} \
@@ -141,24 +142,25 @@ rule kb_umi_count_nac:
 		c1 = 'references/t2g/{reference}/nac/t2c.cdna.txt',
 		c2 = 'references/t2g/{reference}/nac/t2c.unprocessed.txt'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.mature.mtx',
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.nascent.mtx',
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.genes.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.barcodes.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/cells_x_genes.genes.names.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac/counts_unfiltered/adata.h5ad'
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.mature.mtx',
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.nascent.mtx',
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.txt',
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.barcodes.txt',
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.names.txt',
+		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/adata.h5ad'
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
-		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/nac'
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/nac_{wildcards.sum}'
 	shell:
 		'''
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}nac
 		kb count \
 			--tmp tmp{wildcards.SRS}{wildcards.reference}nac \
 			--workflow nac \
+			--sum {wildcards.sum} \
 			-g {input.t2g} \
 			-t {threads} \
 			-x {params.tech} \
@@ -179,14 +181,14 @@ rule kb_bulk_count:
 		t2g = 'references/t2g/{reference}/{workflow}/t2g.txt',
 		cdna = 'references/t2g/{reference}/{workflow}/cdna.fasta'
 	output:
-		ec = quant_path + '/quant/{SRS}/{reference}/{workflow}/matrix.ec',
+		ec = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/matrix.ec',
 	threads: 1 
 	conda:
 		"../envs/kb.yaml"
 	params:
 		tech = lambda wildcards: SRS_dict[wildcards.SRS]['tech'],
 		paired_flag = lambda wildcards: SRS_dict[wildcards.SRS]['parity'],
-		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}'
+		out_dir = lambda wildcards:  f'{quant_path}/quant/{wildcards.SRS}/{wildcards.reference}/{wildcards.workflow}_{wildcards.sum}'
 	shell:
 		'''
 		rm -fr tmp{wildcards.SRS}{wildcards.reference}{wildcards.workflow}

@@ -47,10 +47,10 @@ def make_core_outputs(filename, quant_path, umi_outputs = [], bulk_outputs = [])
 				continue
 			if info[5].upper() == 'TRUE':
 				umi_outputs.append(quant_path + '/quant/' + info[0] + \
-							'/' + info[3] + '/' + info[6])
+							'/' + info[3] + '/' + info[6] + '_' + info[7])
 			else:
 				bulk_outputs.append(quant_path + '/quant/' + info[0] + \
-							'/' + info[3] + '/' + info[6])
+							'/' + info[3] + '/' + info[6] + '_' + info[7])
 				
 		return([list(set(umi_outputs)), list(set(bulk_outputs))])
 
@@ -77,3 +77,7 @@ def ref_builder(file, ref_dict = {}):
 	return(ref_dict)
 
 git_dir = config['git_dir']
+
+#wildcard_constraints:
+#	workflow = ['nac|standard'],
+#	sum = ['total|nucleus|cell']

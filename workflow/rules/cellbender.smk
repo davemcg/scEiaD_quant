@@ -1,13 +1,13 @@
 # remove empty droplets and ambient correct counts
 rule cellbender:
 	input:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/counts_unfiltered/adata.h5ad'
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/counts_unfiltered/adata.h5ad'
 	output:
-		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5'),
-		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender.h5'),
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.h5'),
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender.h5'),
 	params:
-		h5 = quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender.h5',
-		working_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/',
+		h5 = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender.h5',
+		working_dir = quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/',
 	conda:
 		"../envs/cellbender.yaml"
 	shell:
@@ -20,10 +20,10 @@ rule cellbender:
 
 rule h5_to_h5ad:
 	input:
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5'
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.h5'
 	output:
-		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.h5ad'),
-		quant_path + '/quant/{SRS}/{reference}/{workflow}/cellbender/cellbender_filtered.obs.csv.gz'
+		temp(quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.h5ad'),
+		quant_path + '/quant/{SRS}/{reference}/{workflow}_{sum}/cellbender/cellbender_filtered.obs.csv.gz'
 	conda:
 		"../envs/cellbender.yaml"
 	script:
