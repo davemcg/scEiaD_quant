@@ -8,13 +8,19 @@ parser.add_argument("obsoutput")
 args = parser.parse_args()
 
 adata = sc.read_h5ad(args.input)
-
+print(adata)
 scvi.model.SCVI.setup_anndata(adata)
 vae = scvi.model.SCVI(adata)
-vae.train(early_stopping = True, accelerator = 'gpu', batch_size =127)
-
+try:
+    vae.train(early_stopping = True, accelerator = 'gpu', batch_size =127)
+except:
+    vae.train(early_stopping = True, accelerator = 'gpu', batch_size =126)
+    
 solo = scvi.external.SOLO.from_scvi_model(vae)
-solo.train(batch_size =127)
+try:
+    solo.train(batch_size =127)
+except:
+    solo.train(batch_size =126)
 
 preds = solo.predict()
 
