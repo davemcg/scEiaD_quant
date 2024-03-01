@@ -142,12 +142,12 @@ rule kb_umi_count_nac:
 		c1 = 'references/t2g/{reference}/nac/t2c.cdna.txt',
 		c2 = 'references/t2g/{reference}/nac/t2c.unprocessed.txt'
 	output:
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.mature.mtx',
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.nascent.mtx',
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.barcodes.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.names.txt',
-		quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/adata.h5ad'
+		a = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.mature.mtx',
+		b = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.nascent.mtx',
+		c = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.txt',
+		d = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.barcodes.txt',
+		e = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/cells_x_genes.genes.names.txt',
+		f = quant_path + '/quant/{SRS}/{reference}/nac_{sum}/counts_unfiltered/adata.h5ad'
 	threads: 8
 	conda:
 		"../envs/kb.yaml"
@@ -171,6 +171,8 @@ rule kb_umi_count_nac:
 			--h5ad \
 			{input.fastq}
 		rm -f {params.out_dir}*bus
+		mv {output.f} {output.f}O
+		python {git_dir}/workflow/scripts/kb_h5ad_agg.py {output.f}O {output.f}
 		'''
 
 

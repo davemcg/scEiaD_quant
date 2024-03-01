@@ -7,3 +7,4 @@ dependencies:
   - pip
   - pip:
     - kb-python==0.28.2
+    - scanpy
