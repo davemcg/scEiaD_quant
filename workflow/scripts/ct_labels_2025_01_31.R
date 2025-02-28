@@ -4,11 +4,11 @@ library(tidyverse)
 ct_labels <- data.table::fread('/Users/mcgaugheyd/git/scEiaD_quant/scEiaD_cell_labels_2024_08_27.csv.gz')
 
 
-smeta <- data.table::fread('sample_meta.scEiaD_v1.2025_01_31.01.tsv.gz')
+smeta <- data.table::fread('sample_meta.scEiaD_v1.2025_02_03.02.tsv.gz')
 # pulling "temporary" full species h5ad objects made with ~/git/scEiaD_modeling/workflow/scripts/merge_adata.py
 # to line up author samples <-> sra IDs by brute force (counting barcode matches)
 mm_obs <- data.table::fread('data/mm111.adata.solo.2025x.obs.csv.gz') %>% select(-17)
-hs_obs <- data.table::fread('~/data/scEiaD_modeling/hs111.adata.solo.2025x2.obs.csv.gz') %>% select(-17)
+hs_obs <- data.table::fread('~/data/scEiaD_modeling/hs111.adata.solo.20250131.obs.csv.gz') %>% select(-17)
 
 
 ###################
@@ -83,8 +83,45 @@ hs_obs_srp510712 <- hs_obs %>% filter(study_accession == 'SRP510712') %>%
                      )), 
             by = c("bc_core","sample")) 
 
+# srp443999
+srp443999_files <- list.files('data/srp443999', full.names = TRUE)
+srp443999_list <- set_names(srp443999_files) %>% 
+  map(., read_csv)
+srp443999_cells <- list()
+for (i in names(srp443999_list)){
+  srp443999_cells[[i]] <- srp443999_list[[i]] %>% select(`...1`, CellType)
+}
+
+srp443999_cells_cm <- srp443999_cells %>% 
+  bind_rows(.id = 'file') %>% 
+  mutate(
+    MajorCellType = case_when(CellType == 'ACs' ~ 'amacrine',
+                              #CellType == 'Amacrine and horizontal cells' ~ 'ac/hc precursor',
+                              CellType == 'Amacrine cells' ~ 'amacrine',
+                              CellType == 'Bipolar cells' ~ 'bipolar',
+                              CellType %in%  c('cones','Cones') ~ 'cone',
+                              CellType == 'Corneal epithelium' ~ 'epithelium',
+                              CellType %in% c('HCs','Horizontal cells') ~ 'horizontal',
+                              CellType == 'Microglia' ~ 'microglia',
+                              CellType == 'Muller glia' ~ 'mueller',
+                              CellType == 'Photoreceptor precursors' ~ 'photoreceptor precursor',
+                              CellType == 'RGCs' ~ 'retinal ganglion',
+                              CellType %in% c("rods","Rods") ~ 'rod',
+                              CellType %in%  c('RPC','RPCs') ~ 'rpc',
+                              CellType == 'RPE' ~ 'rpe',
+                              grepl("^T\\d", CellType) ~ 'neurogenic'
+    )) %>% 
+  mutate(SubCellType = CellType,
+         CellType = MajorCellType,
+         biosample_title = str_extract(file, "GSM\\d+"),
+         bc = gsub('-\\d+', '', `...1`)) %>% 
+  left_join(smeta %>% select(sample_accession, biosample_title), by = 'biosample_title') %>% 
+  mutate(barcode = paste0(bc, '_', sample_accession)) %>% 
+  select(barcode, MajorCellType, CellType, SubCellType)
+
 
 bind_rows(ct_labels,
-          hs_obs_srp510712 %>% select(barcode, MajorCellType, CellType = MajorCellType, SubCellType, cell_type_ontology_term_id),
-          mm_obs_9395 %>% select(barcode, MajorCellType, CellType = MajorCellType, SubCellType)) %>% 
-  write_csv(, file = '/Users/mcgaugheyd/git/scEiaD_quant/scEiaD_cell_labels_2025_01_31.01.csv.gz')
+          hs_obs_srp510712 %>% select(barcode, MajorCellType, SubCellType, cell_type_ontology_term_id) %>% mutate(CellType = MajorCellType),
+          mm_obs_9395 %>% select(barcode, MajorCellType, CellType = MajorCellType, SubCellType),
+          srp443999_cells_cm) %>% 
+  write_csv(file = '/Users/mcgaugheyd/git/scEiaD_quant/scEiaD_cell_labels_2025_02_04.02.csv.gz')
